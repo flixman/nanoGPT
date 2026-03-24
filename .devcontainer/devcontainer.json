@@ -1,0 +1,31 @@
+{
+    "name": "nanoGPT",
+    "build": {
+        "dockerfile": "Containerfile",
+        "context": "${localWorkspaceFolder}"
+    },
+    "runArgs": ["--security-opt", "label=disable", "--privileged", "--device", "nvidia.com/gpu=all"],
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=${env:HOME}/.config/gh,target=/root/.config/gh,type=bind"
+    ],
+    "containerEnv": {
+        "WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+    },
+    "remoteEnv": {
+        "GH_HOST": "github.com"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-azuretools.vscode-docker",
+                "timonwong.shellcheck",
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    }
+}

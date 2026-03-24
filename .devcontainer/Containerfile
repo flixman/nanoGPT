@@ -1,0 +1,29 @@
+FROM python:3.13-slim AS BASE
+
+# Install essential system packages
+RUN apt update && \
+    apt install -y live-build && \
+    apt install -y --no-install-recommends \
+    git bash binutils curl gpg tar vim less passwd xz-utils bash sudo locales openssh-client && \
+    sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8
+
+ENV LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
+
+# Create non-root user for VS Code Dev Container
+RUN useradd -s /bin/bash -m vscode && echo "vscode ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# Set up working environment
+WORKDIR /workspace
+
+# Add local bin to PATH
+ENV PATH="/home/vscode/.local/bin:${PATH}" PYTHONPATH="/home/vscode/.local/lib/python3.13/site-packages:/usr/lib/python3/dist-packages:${PYTHONPATH}"
+
+# Switch to non-root user
+USER vscode
+
+RUN --mount=type=bind,source=requirements.txt,target=/tmp/requirements.txt \
+    pip install -r /tmp/requirements.txt
+
+CMD ["bash"]
